@@ -1,2 +1,4 @@
 dist
 node_modules
+
+**/*.scss.d.ts
