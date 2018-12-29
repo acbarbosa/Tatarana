@@ -19,3 +19,5 @@ nvm use >/dev/null 2>&1 || {
     nvm install
     nvm use
 }
+
+npm install
