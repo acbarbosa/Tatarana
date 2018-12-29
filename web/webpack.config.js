@@ -1,53 +1,75 @@
-module.exports = {
-    entry: "./src/index.tsx",
-    output: {
-        filename: "bundle.js",
-        path: __dirname + "/dist"
-    },
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-    // Enable sourcemaps for debugging webpack's output.
-    devtool: "source-map",
+module.exports = (env, argv) => {
+    const devMode = argv.mode !== 'production'
+    
+    return {
+        entry: "./src/index.tsx",
+        output: {
+            filename: devMode ? "[name].js" : "[name].[chunkhash].js",
+            path: __dirname + "/dist"
+        },
 
-    resolve: {
-        extensions: [".ts", ".tsx", ".js", ".json", ".scss"]
-    },
+        // Enable sourcemaps for debugging webpack's output.
+        devtool: "source-map",
 
-    module: {
-        rules: [
-            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
-            {
-                test: /\.tsx?$/,
-                loader: "awesome-typescript-loader"
-            },
+        resolve: {
+            extensions: [".ts", ".tsx", ".js", ".json", ".scss"]
+        },
 
-            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            {
-                enforce: "pre",
-                test: /\.js$/,
-                loader: "source-map-loader"
-            },
+        plugins: [
+            new MiniCssExtractPlugin({
+                // Options similar to the same options in webpackOptions.output
+                // both options are optional
+                filename: devMode ? "[name].css" : "[name].[hash].css",
+                chunkFilename: devMode ? "[id].css" : "[id].[hash].css"
+            }),
 
-            {
-                test: /\.scss$/,
-                use: [
-                    { loader: "style-loader" },
-                    {
-                        loader: "typings-for-css-modules-loader",
-                        options: {
-                            modules: true,
-                            namedExport: true,
-                            camelCase: true,
-                            localIdentName: '[name]__[local]___[hash:base64:5]'
+            new HtmlWebpackPlugin({
+                filename: "index.html",
+                template: "./src/index.html",
+                inject: false
+            })
+        ],
+
+        module: {
+            rules: [
+                // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+                {
+                    test: /\.tsx?$/,
+                    loader: "awesome-typescript-loader"
+                },
+
+                // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+                {
+                    enforce: "pre",
+                    test: /\.js$/,
+                    loader: "source-map-loader"
+                },
+
+                {
+                    test: /\.scss$/,
+                    use: [
+                        { loader:  MiniCssExtractPlugin.loader },
+                        {
+                            loader: "typings-for-css-modules-loader",
+                            options: {
+                                modules: true,
+                                namedExport: true,
+                                camelCase: true,
+                                localIdentName: '[name]__[local]___[hash:base64:5]'
+                            }
+                        },
+                        {
+                            loader: "sass-loader",
+                            options: {
+                                modules: true
+                            }
                         }
-                    },
-                    {
-                        loader: "sass-loader",
-                        options: {
-                            modules: true
-                        }
-                    }
-                ]
-            }
-        ]
+                    ]
+                }
+            ]
+        }
     }
 };
