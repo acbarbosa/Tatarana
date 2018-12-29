@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const CleanWebpackPlugin = require("clean-webpack-plugin")
 
 module.exports = (env, argv) => {
     const devMode = argv.mode !== 'production'
@@ -30,7 +31,9 @@ module.exports = (env, argv) => {
                 filename: "index.html",
                 template: "./src/index.html",
                 inject: false
-            })
+            }),
+
+            new CleanWebpackPlugin(["dist"])
         ],
 
         module: {
